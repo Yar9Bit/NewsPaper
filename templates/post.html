@@ -1,0 +1,30 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+{{ post.title }}
+{% endblock title %}
+
+{% block content %}
+    <div>
+        <a href="/news">Вернуться назад</a>
+    </div>
+    <div>
+        Статья была написана {{ post.dateCreate|timesince }} назад
+    </div>
+    <div>
+        <div>
+            <div>
+                <h1>{{ post.title }}</h1>
+            </div>
+            <div>
+                <h2>{{ post.get_category_display }}</h2>
+            </div>
+            <div>
+                <h5>
+                    Дата написания: {{ post.dateCreate|date:'d M Y'}} {{ post.dateCreate|time }}
+                </h5>
+            </div>
+            <p class="display-5">{{ post.author.authorUser.username }} сообщает: {{ post.text }}</p>
+        </div>
+    </div>
+{% endblock content %}

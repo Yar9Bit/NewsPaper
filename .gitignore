@@ -205,3 +205,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+NewsPaper
+.idea/dataSources.xml
+.idea/dataSources.xml

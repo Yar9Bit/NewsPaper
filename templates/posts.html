@@ -1,0 +1,32 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+
+{% block title %}
+    Posts
+{% endblock title %}
+
+{% block content %}
+    Кол-во новостей: {{ posts|length }}
+    <h1>Новости</h1>
+    {% if posts %}
+        {% for post in posts %}
+            <div class="d-inline-flex">
+                <div class="container-fluid m-3">
+                    <div class="">
+                        Заголовок: {{ post.title|censor }}
+                    </div>
+                    <div>
+                        Дата публикации: {{ post.dateCreate|date:'d M Y' }}
+                    </div>
+                    <div>
+                        Текст: {{ post.text|truncatechars:20|censor }}
+                    </div>
+                    <a href="{{ post.id }}">Читать далее</a>
+                </div>
+            </div>
+
+        {% endfor %}
+    {% else %}
+        <h1>Пусто</h1>
+    {% endif %}
+{% endblock content %}
