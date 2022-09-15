@@ -1,19 +1,71 @@
-import datetime
-
-from django.views.generic import ListView, DetailView
-from .models import Post
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from .models import Post, Category
+from .filters import PostFilters
+from .forms import PostForm
 
 
 class PostView(ListView):
     model = Post
-    template_name = 'posts.html'
+    template_name = 'post_list.html'
     context_object_name = 'posts'
+    ordering = ['-dateCreate']
+    paginate_by = 10
+    form_class = PostForm
 
-    def get_queryset(self):
-        return Post.objects.order_by('-dateCreate')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter'] = PostFilters(self.request.GET, queryset=self.get_queryset())
+        context['categories'] = Category.objects.all()
+        context['form'] = PostForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            form.save()
+
+        return super().get(request, *args, **kwargs)
 
 
 class PostDetail(DetailView):
     model = Post
-    template_name = 'post.html'
+    template_name = 'post_detail.html'
     context_object_name = 'post'
+
+
+class SearchView(ListView):
+    model = Post
+    template_name = 'post_search.html'
+    context_object_name = 'post_search'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter'] = PostFilters(self.request.GET, queryset=self.get_queryset())
+
+        return context
+
+
+class CreatePost(CreateView):
+    form_class = PostForm
+    template_name = 'post_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = PostForm()
+        return context
+
+
+class UpdatePost(UpdateView):
+    template_name = 'post_edit.html'
+    form_class = PostForm
+
+    def get_object(self, queryset=None, **kwargs):
+        id = self.kwargs.get('pk')
+        return Post.objects.get(pk=id)
+
+
+class DeletePost(DeleteView):
+    template_name = 'post_delete.html'
+    queryset = Post.objects.all()
+    success_url = '/news/'
