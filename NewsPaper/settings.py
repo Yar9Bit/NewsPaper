@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-g7y24mi!tcqx4%n0x@@dd@hx27d*dd#p37@pnyi$$9udfzx1zz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 # Application definition
 
@@ -39,9 +39,17 @@ INSTALLED_APPS = [
     'django.contrib.flatpages',
     'django_filters',
 
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    
     'news',
+    'sign',
+    'protect',
 
 ]
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
 
 SITE_ID = 1
 
@@ -61,7 +69,7 @@ ROOT_URLCONF = 'NewsPaper.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
+        'DIRS': [BASE_DIR/'templates']
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -73,6 +81,11 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend'
 ]
 
 WSGI_APPLICATION = 'NewsPaper.wsgi.application'
@@ -131,3 +144,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_FORMS = {'signup': 'sign.models.BasicSignupForm'}

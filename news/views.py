@@ -1,4 +1,5 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from .models import Post, Category
 from .filters import PostFilters
 from .forms import PostForm
@@ -46,9 +47,10 @@ class SearchView(ListView):
         return context
 
 
-class CreatePost(CreateView):
+class CreatePost(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     form_class = PostForm
     template_name = 'post_create.html'
+    permission_required = 'news.add_post'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -56,16 +58,18 @@ class CreatePost(CreateView):
         return context
 
 
-class UpdatePost(UpdateView):
+class UpdatePost(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     template_name = 'post_edit.html'
     form_class = PostForm
+    permission_required = 'news.change_post'
 
     def get_object(self, queryset=None, **kwargs):
         id = self.kwargs.get('pk')
         return Post.objects.get(pk=id)
 
 
-class DeletePost(DeleteView):
+class DeletePost(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
+    permission_required = 'news.delete_post'
     template_name = 'post_delete.html'
     queryset = Post.objects.all()
     success_url = '/news/'
