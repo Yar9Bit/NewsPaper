@@ -29,4 +29,7 @@
         <a href="{% url 'post_edit' post.id %}"><u>Редактировать</u></a>
         <a href="{% url 'post_delete' post.id %}"><u>Удалить</u></a>
     </div>
+    {% if is_not_subscribe  %}
+        <a href="{% url 'sub_category' post.pk %}"><h6>Подписаться на категорию: {{ category }}</h6></a>
+    {% endif %}
 {% endblock content %}

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
+from django.core.cache import cache
 
 
 class Author(models.Model):
@@ -8,15 +9,15 @@ class Author(models.Model):
     ratingAuthor = models.SmallIntegerField(default=0)
 
     def update_rating(self):
-        postRating = self.post_set.all().aggregate(postRating=Sum('rating'))
-        pRat = 0
-        pRat += postRating.get('postRating')
+        post_rating = self.post_set.all().aggregate(postRating=Sum('rating'))
+        p_rat = 0
+        p_rat += post_rating.get('postRating')
 
-        commentRating = self.authorUser.comment_set.all().aggregate(commentRating=Sum('rating'))
-        cRat = 0
-        cRat += commentRating.get('commentRating')
+        comment_rating = self.authorUser.comment_set.all().aggregate(commentRating=Sum('rating'))
+        c_rat = 0
+        c_rat += comment_rating.get('commentRating')
 
-        self.ratingAuthor = pRat * 3 + cRat
+        self.ratingAuthor = p_rat * 3 + c_rat
         self.save()
 
     def __str__(self):
@@ -25,9 +26,18 @@ class Author(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=64, unique=True)
+    subscribers = models.ManyToManyField(User, through='CategorySubscribe', blank=True)
 
     def __str__(self):
         return f'{self.name}'
+
+
+class CategorySubscribe(models.Model):
+    subscriber_thru = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Подписчик')
+    category_thru = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')
+
+    def __str__(self):
+        return f'{self.subscriber_thru} <-> {self.category_thru.name}'
 
 
 class Post(models.Model):
@@ -63,10 +73,17 @@ class Post(models.Model):
     def get_absolute_url(self):
         return f'/news/{self.id}'
 
+    def save(self, *args, **kwargs):
+        super(Post, self).save(*args, **kwargs)
+        cache.delete(f'News-{self.pk}')
+
 
 class PostCategory(models.Model):
     postThrough = models.ForeignKey(Post, on_delete=models.CASCADE)
     categoryThrough = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.categoryThrough
 
 
 class Comment(models.Model):

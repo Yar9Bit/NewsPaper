@@ -14,6 +14,8 @@
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
     </head>
 <body>
+{% load cache %}
+{% cache 30 header %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container">
                     <a class="navbar-brand" href="/news">NewsPaper</a>
@@ -23,6 +25,7 @@
                         <span class="navbar-toggler-icon"></span></button>
                 </div>
     </nav>
+{% endcache %}
     <div class="container">
         <div class="mt-5">
             {% block content %}
